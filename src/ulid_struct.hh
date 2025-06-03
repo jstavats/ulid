@@ -268,6 +268,16 @@ namespace ulid
         inline bool operator== (const ULID& other) const
         {
             // unrolled loop
+            //get some initial values to load into cache, then do the remainder
+
+            if (data[0] != other.data[0])
+            {
+                return false;
+            }
+            if (data[8] != other.data[8])
+            {
+                return false;
+            }
             if (data[15] != other.data[15])
             {
                 return false;
@@ -293,10 +303,6 @@ namespace ulid
                 return false;
             }
             if (data[9] != other.data[9])
-            {
-                return false;
-            }
-            if (data[8] != other.data[8])
             {
                 return false;
             }
@@ -328,10 +334,7 @@ namespace ulid
             {
                 return false;
             }
-            if (data[0] != other.data[0])
-            {
-                return false;
-            }
+
             return true;
         }
 
