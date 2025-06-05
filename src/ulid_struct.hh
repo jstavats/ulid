@@ -274,6 +274,10 @@ namespace ulid
             {
                 return false;
             }
+            if (data[5] != other.data[5])
+            {
+                return false;
+            }
             if (data[8] != other.data[8])
             {
                 return false;
@@ -311,10 +315,6 @@ namespace ulid
                 return false;
             }
             if (data[6] != other.data[6])
-            {
-                return false;
-            }
-            if (data[5] != other.data[5])
             {
                 return false;
             }
