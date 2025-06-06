@@ -339,6 +339,7 @@ namespace ulid
             return true;
         }
 
+        std::mt19937 mt{ std::random_device{}() };
     };
 
     /**
@@ -435,6 +436,20 @@ namespace ulid
         ulid.data[15] = Distribution_0_255 (generator);
     }
 
+    inline void EncodeEntropyMt19937 (ULID& ulid)
+    {
+        ulid.data[6] = Distribution_0_255 (ulid.mt);
+        ulid.data[7] = Distribution_0_255 (ulid.mt);
+        ulid.data[8] = Distribution_0_255 (ulid.mt);
+        ulid.data[9] = Distribution_0_255 (ulid.mt);
+        ulid.data[10] = Distribution_0_255 (ulid.mt);
+        ulid.data[11] = Distribution_0_255 (ulid.mt);
+        ulid.data[12] = Distribution_0_255 (ulid.mt);
+        ulid.data[13] = Distribution_0_255 (ulid.mt);
+        ulid.data[14] = Distribution_0_255 (ulid.mt);
+        ulid.data[15] = Distribution_0_255 (ulid.mt);
+    }
+
     /**
      * Encode will create an encoded ULID with a timestamp and a generator.
      * */
@@ -442,6 +457,15 @@ namespace ulid
     {
         EncodeTime (timestamp, ulid);
         EncodeEntropy (rng, ulid);
+    }
+
+    /**
+    * EncodeNowRand = EncodeTimeSystemClockNow + EncodeEntropyMt19937
+    * */
+    inline void GenerateNow (ULID& ulid)
+    {
+        EncodeTimeSystemClockNow (ulid);
+        EncodeEntropyMt19937 (ulid);
     }
 
     /**
