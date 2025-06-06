@@ -20,6 +20,7 @@ typedef uint8_t rand_t;
 #endif
 
 #define HUMAN_READABLE_TIME
+#define humanoffset 9
 
 namespace ulid
 {
@@ -568,7 +569,7 @@ namespace ulid
      * entropy:
      * follows similarly, except now all components are set to 5 bits.
      * */
-    inline void MarshalToHuman (const ULID& ulid, char dst[34])
+    inline void MarshalToHuman (const ULID& ulid, char dst[27 + humanoffset])
     {
         //do timestamp - now 17 bytes in total
         std::time_t ulidTime = Time (ulid);
@@ -577,30 +578,30 @@ namespace ulid
         tm* ptm;
         ptm = gmtime (&ulidTime); //this conversion needs seconds apparently
 
-        //make time string (14 chars)
-        strftime (dst, 15, "%Y%m%d%H%M%S", ptm);
+        //make time string (14+T chars )
+        strftime (dst, 16, "%Y%m%dT%H%M%S", ptm);
 
-        //make msec string (3 chars)
-        snprintf (&dst[14], 4, "%03d", ms);
+        //make msec string (3+Z chars)
+        snprintf (&dst[15], 5, "%03dZ", ms);
 
         // 16 bytes of entropy
-        dst[17] = Encoding[(ulid.data[6] & 248) >> 3];
-        dst[18] = Encoding[((ulid.data[6] & 7) << 2) | ((ulid.data[7] & 192) >> 6)];
-        dst[19] = Encoding[(ulid.data[7] & 62) >> 1];
-        dst[20] = Encoding[((ulid.data[7] & 1) << 4) | ((ulid.data[8] & 240) >> 4)];
-        dst[21] = Encoding[((ulid.data[8] & 15) << 1) | ((ulid.data[9] & 128) >> 7)];
-        dst[22] = Encoding[(ulid.data[9] & 124) >> 2];
-        dst[23] = Encoding[((ulid.data[9] & 3) << 3) | ((ulid.data[10] & 224) >> 5)];
-        dst[24] = Encoding[ulid.data[10] & 31];
-        dst[25] = Encoding[(ulid.data[11] & 248) >> 3];
-        dst[26] = Encoding[((ulid.data[11] & 7) << 2) | ((ulid.data[12] & 192) >> 6)];
-        dst[27] = Encoding[(ulid.data[12] & 62) >> 1];
-        dst[28] = Encoding[((ulid.data[12] & 1) << 4) | ((ulid.data[13] & 240) >> 4)];
-        dst[29] = Encoding[((ulid.data[13] & 15) << 1) | ((ulid.data[14] & 128) >> 7)];
-        dst[30] = Encoding[(ulid.data[14] & 124) >> 2];
-        dst[31] = Encoding[((ulid.data[14] & 3) << 3) | ((ulid.data[15] & 224) >> 5)];
-        dst[32] = Encoding[ulid.data[15] & 31];
-        dst[33] = 0;
+        dst[10 + humanoffset] = Encoding[(ulid.data[6] & 248) >> 3];
+        dst[11 + humanoffset] = Encoding[((ulid.data[6] & 7) << 2) | ((ulid.data[7] & 192) >> 6)];
+        dst[12 + humanoffset] = Encoding[(ulid.data[7] & 62) >> 1];
+        dst[13 + humanoffset] = Encoding[((ulid.data[7] & 1) << 4) | ((ulid.data[8] & 240) >> 4)];
+        dst[14 + humanoffset] = Encoding[((ulid.data[8] & 15) << 1) | ((ulid.data[9] & 128) >> 7)];
+        dst[15 + humanoffset] = Encoding[(ulid.data[9] & 124) >> 2];
+        dst[16 + humanoffset] = Encoding[((ulid.data[9] & 3) << 3) | ((ulid.data[10] & 224) >> 5)];
+        dst[17 + humanoffset] = Encoding[ulid.data[10] & 31];
+        dst[18 + humanoffset] = Encoding[(ulid.data[11] & 248) >> 3];
+        dst[19 + humanoffset] = Encoding[((ulid.data[11] & 7) << 2) | ((ulid.data[12] & 192) >> 6)];
+        dst[20 + humanoffset] = Encoding[(ulid.data[12] & 62) >> 1];
+        dst[21 + humanoffset] = Encoding[((ulid.data[12] & 1) << 4) | ((ulid.data[13] & 240) >> 4)];
+        dst[22 + humanoffset] = Encoding[((ulid.data[13] & 15) << 1) | ((ulid.data[14] & 128) >> 7)];
+        dst[23 + humanoffset] = Encoding[(ulid.data[14] & 124) >> 2];
+        dst[24 + humanoffset] = Encoding[((ulid.data[14] & 3) << 3) | ((ulid.data[15] & 224) >> 5)];
+        dst[25 + humanoffset] = Encoding[ulid.data[15] & 31];
+        dst[26 + humanoffset] = 0;
     }
 
 
@@ -620,8 +621,8 @@ namespace ulid
     * */
     inline std::string MarshalHuman (const ULID& ulid)
     {
-        char data[34];
-        data[33] = '\0';
+        char data[27 + humanoffset];
+        data[27 + humanoffset - 1] = '\0';
         MarshalToHuman (ulid, data);
         return std::string (data);
     }
@@ -745,7 +746,7 @@ namespace ulid
     /**
     * UnmarshalHumanFrom will unmarshal a ULID from the passed character array with human readable timestamp.
     * */
-    inline void UnmarshalHumanFrom (const char str[34], ULID& ulid)
+    inline void UnmarshalHumanFrom (const char str[27 + humanoffset], ULID& ulid)
     {
         // read and interpret the timestamp characters
         tm tdata;
@@ -754,14 +755,14 @@ namespace ulid
         //get most of the timestamp
         std::istringstream ss (str);
         ss.imbue (std::locale ());
-        ss >> std::get_time (&tdata, "%Y%m%d%H%M%S");
+        ss >> std::get_time (&tdata, "%Y%m%dT%H%M%S");
 
         //get the millisecond part
         int msec;
         char msecchars[4];
-        msecchars[0] = str[14];
-        msecchars[1] = str[15];
-        msecchars[2] = str[16];
+        msecchars[0] = str[15];
+        msecchars[1] = str[16];
+        msecchars[2] = str[17];
         msecchars[3] = 0;
         msec = atoi (msecchars);
 
@@ -775,7 +776,6 @@ namespace ulid
         ulid::EncodeTime (ulidTime, ulid);
 
         // entropy
-#define humanoffset 7
         ulid.data[6] = (dec[int (str[10 + humanoffset])] << 3) | (dec[int (str[11 + humanoffset])] >> 2);
         ulid.data[7] = (dec[int (str[11 + humanoffset])] << 6) | (dec[int (str[12 + humanoffset])] << 1) | (dec[int (str[13 + humanoffset])] >> 4);
         ulid.data[8] = (dec[int (str[13 + humanoffset])] << 4) | (dec[int (str[14 + humanoffset])] >> 1);
