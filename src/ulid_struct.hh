@@ -30,7 +30,11 @@ namespace ulid
      * */
     struct ULID
     {
-        uint8_t data[16];
+        union
+        {
+            uint8_t data[16]; // 16 bytes = 128 bits
+            uint32_t data32[4]; // 4 x 32 bits = 128 bits //careful about endianism here
+        };
 
         ULID ()
         {
@@ -39,22 +43,11 @@ namespace ulid
             // }
 
             // unrolled loop
-            data[0] = 0;
-            data[1] = 0;
-            data[2] = 0;
-            data[3] = 0;
-            data[4] = 0;
-            data[5] = 0;
-            data[6] = 0;
-            data[7] = 0;
-            data[8] = 0;
-            data[9] = 0;
-            data[10] = 0;
-            data[11] = 0;
-            data[12] = 0;
-            data[13] = 0;
-            data[14] = 0;
-            data[15] = 0;
+            data32[0] = 0;
+            data32[1] = 0;
+            data32[2] = 0;
+            data32[3] = 0;
+
         }
 
         ULID (uint64_t val)
@@ -105,22 +98,11 @@ namespace ulid
             // }
 
             // unrolled loop
-            data[0] = other.data[0];
-            data[1] = other.data[1];
-            data[2] = other.data[2];
-            data[3] = other.data[3];
-            data[4] = other.data[4];
-            data[5] = other.data[5];
-            data[6] = other.data[6];
-            data[7] = other.data[7];
-            data[8] = other.data[8];
-            data[9] = other.data[9];
-            data[10] = other.data[10];
-            data[11] = other.data[11];
-            data[12] = other.data[12];
-            data[13] = other.data[13];
-            data[14] = other.data[14];
-            data[15] = other.data[15];
+            data32[0] = other.data32[0];
+            data32[1] = other.data32[1];
+            data32[2] = other.data32[2];
+            data32[3] = other.data32[3];
+
         }
 
         ULID& operator=(const ULID& other)
@@ -130,22 +112,10 @@ namespace ulid
             // }
 
             // unrolled loop
-            data[0] = other.data[0];
-            data[1] = other.data[1];
-            data[2] = other.data[2];
-            data[3] = other.data[3];
-            data[4] = other.data[4];
-            data[5] = other.data[5];
-            data[6] = other.data[6];
-            data[7] = other.data[7];
-            data[8] = other.data[8];
-            data[9] = other.data[9];
-            data[10] = other.data[10];
-            data[11] = other.data[11];
-            data[12] = other.data[12];
-            data[13] = other.data[13];
-            data[14] = other.data[14];
-            data[15] = other.data[15];
+            data32[0] = other.data32[0];
+            data32[1] = other.data32[1];
+            data32[2] = other.data32[2];
+            data32[3] = other.data32[3];
 
             return *this;
         }
@@ -158,53 +128,18 @@ namespace ulid
             // }
 
             // unrolled loop
-            data[0] = other.data[0];
-            other.data[0] = 0;
+            data32[0] = other.data32[0];
+            other.data32[0] = 0;
 
-            data[1] = other.data[1];
-            other.data[1] = 0;
+            data32[1] = other.data32[1];
+            other.data32[1] = 0;
 
-            data[2] = other.data[2];
-            other.data[2] = 0;
+            data32[2] = other.data32[2];
+            other.data32[2] = 0;
 
-            data[3] = other.data[3];
-            other.data[3] = 0;
+            data32[3] = other.data32[3];
+            other.data32[3] = 0;
 
-            data[4] = other.data[4];
-            other.data[4] = 0;
-
-            data[5] = other.data[5];
-            other.data[5] = 0;
-
-            data[6] = other.data[6];
-            other.data[6] = 0;
-
-            data[7] = other.data[7];
-            other.data[7] = 0;
-
-            data[8] = other.data[8];
-            other.data[8] = 0;
-
-            data[9] = other.data[9];
-            other.data[9] = 0;
-
-            data[10] = other.data[10];
-            other.data[10] = 0;
-
-            data[11] = other.data[11];
-            other.data[11] = 0;
-
-            data[12] = other.data[12];
-            other.data[12] = 0;
-
-            data[13] = other.data[13];
-            other.data[13] = 0;
-
-            data[14] = other.data[14];
-            other.data[14] = 0;
-
-            data[15] = other.data[15];
-            other.data[15] = 0;
         }
 
         ULID& operator=(ULID&& other)
@@ -215,53 +150,17 @@ namespace ulid
             // }
 
             // unrolled loop
-            data[0] = other.data[0];
-            other.data[0] = 0;
+            data32[0] = other.data32[0];
+            other.data32[0] = 0;
 
-            data[1] = other.data[1];
-            other.data[1] = 0;
+            data32[1] = other.data32[1];
+            other.data32[1] = 0;
 
-            data[2] = other.data[2];
-            other.data[2] = 0;
+            data32[2] = other.data32[2];
+            other.data32[2] = 0;
 
-            data[3] = other.data[3];
-            other.data[3] = 0;
-
-            data[4] = other.data[4];
-            other.data[4] = 0;
-
-            data[5] = other.data[5];
-            other.data[5] = 0;
-
-            data[6] = other.data[6];
-            other.data[6] = 0;
-
-            data[7] = other.data[7];
-            other.data[7] = 0;
-
-            data[8] = other.data[8];
-            other.data[8] = 0;
-
-            data[9] = other.data[9];
-            other.data[9] = 0;
-
-            data[10] = other.data[10];
-            other.data[10] = 0;
-
-            data[11] = other.data[11];
-            other.data[11] = 0;
-
-            data[12] = other.data[12];
-            other.data[12] = 0;
-
-            data[13] = other.data[13];
-            other.data[13] = 0;
-
-            data[14] = other.data[14];
-            other.data[14] = 0;
-
-            data[15] = other.data[15];
-            other.data[15] = 0;
+            data32[3] = other.data32[3];
+            other.data32[3] = 0;
 
             return *this;
         }
@@ -271,67 +170,19 @@ namespace ulid
             // unrolled loop
             //get some initial values to load into cache, then do the remainder
 
-            if (data[0] != other.data[0])
+            if (data32[0] != other.data32[0])
             {
                 return false;
             }
-            if (data[5] != other.data[5])
+            if (data32[1] != other.data32[1])
             {
                 return false;
             }
-            if (data[8] != other.data[8])
+            if (data32[2] != other.data32[2])
             {
                 return false;
             }
-            if (data[15] != other.data[15])
-            {
-                return false;
-            }
-            if (data[14] != other.data[14])
-            {
-                return false;
-            }
-            if (data[13] != other.data[13])
-            {
-                return false;
-            }
-            if (data[12] != other.data[12])
-            {
-                return false;
-            }
-            if (data[11] != other.data[11])
-            {
-                return false;
-            }
-            if (data[10] != other.data[10])
-            {
-                return false;
-            }
-            if (data[9] != other.data[9])
-            {
-                return false;
-            }
-            if (data[7] != other.data[7])
-            {
-                return false;
-            }
-            if (data[6] != other.data[6])
-            {
-                return false;
-            }
-            if (data[4] != other.data[4])
-            {
-                return false;
-            }
-            if (data[3] != other.data[3])
-            {
-                return false;
-            }
-            if (data[2] != other.data[2])
-            {
-                return false;
-            }
-            if (data[1] != other.data[1])
+            if (data32[3] != other.data32[3])
             {
                 return false;
             }
